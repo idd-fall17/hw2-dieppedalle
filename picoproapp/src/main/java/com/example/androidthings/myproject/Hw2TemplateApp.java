@@ -10,31 +10,70 @@ import com.google.android.things.pio.Gpio;
 public class Hw2TemplateApp extends SimplePicoPro {
     @Override
     public void setup() {
+        printKeyLayout();
+        //changeFontScreen();
+        //test();
         //set two GPIOs to input
-        pinMode(GPIO_128,Gpio.DIRECTION_IN);
-        setEdgeTrigger(GPIO_128,Gpio.EDGE_BOTH);
+        pinMode(GPIO_175,Gpio.DIRECTION_IN);
+        setEdgeTrigger(GPIO_175,Gpio.EDGE_BOTH);
 
-        pinMode(GPIO_39,Gpio.DIRECTION_IN);
-        setEdgeTrigger(GPIO_39,Gpio.EDGE_BOTH);
+        pinMode(GPIO_174,Gpio.DIRECTION_IN);
+        setEdgeTrigger(GPIO_174,Gpio.EDGE_BOTH);
+
+        pinMode(GPIO_173,Gpio.DIRECTION_IN);
+        setEdgeTrigger(GPIO_173,Gpio.EDGE_BOTH);
+
+        pinMode(GPIO_172,Gpio.DIRECTION_IN);
+        setEdgeTrigger(GPIO_172,Gpio.EDGE_BOTH);
+
+        pinMode(GPIO_10,Gpio.DIRECTION_IN);
+        setEdgeTrigger(GPIO_10,Gpio.EDGE_BOTH);
+
+        pinMode(GPIO_32,Gpio.DIRECTION_IN);
+        setEdgeTrigger(GPIO_32,Gpio.EDGE_BOTH);
+
+        pinMode(GPIO_33,Gpio.DIRECTION_IN);
+        setEdgeTrigger(GPIO_33,Gpio.EDGE_BOTH);
+
+        pinMode(GPIO_34,Gpio.DIRECTION_IN);
+        setEdgeTrigger(GPIO_34,Gpio.EDGE_BOTH);
     }
 
     @Override
     public void loop() {
-        //nothing to do here
 
     }
 
     @Override
     void digitalEdgeEvent(Gpio pin, boolean value) {
         println("digitalEdgeEvent"+pin+", "+value);
-        // when 128 goes from LOW to HIGH
-        // this is on button button release for pull-up resistors
-        if(pin==GPIO_128 && value==HIGH) {
-            printCharacterToScreen('a');
+        if(pin==GPIO_175 && value==HIGH) {
+            downPressed();
+            printKeyLayout();
         }
-        //when 39 goes from HIGH to HIGH
-        else if (pin==GPIO_39 && value==HIGH) {
-            printCharacterToScreen('b');
+        else if(pin==GPIO_174 && value==HIGH) {
+            switchSymbol();
+        }
+        else if(pin==GPIO_173 && value==HIGH) {
+            setCaps();
+        }
+        else if(pin==GPIO_172 && value==HIGH) {
+            printCurentCharacter();
+        }
+        else if(pin==GPIO_10 && value==HIGH) {
+            leftPressed();
+            printKeyLayout();
+        }
+        else if(pin==GPIO_32 && value==HIGH) {
+            rightPressed();
+            printKeyLayout(); 
+        }
+        else if(pin==GPIO_33 && value==HIGH) {
+            upPressed();
+            printKeyLayout();
+        }
+        else if(pin==GPIO_34 && value==HIGH) {
+            printCharacterToScreen(' ');
         }
     }
 }

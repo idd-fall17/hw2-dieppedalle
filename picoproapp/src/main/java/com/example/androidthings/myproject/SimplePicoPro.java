@@ -5,6 +5,7 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.widget.EditText;
 
+import android.content.Context;
 import com.google.android.things.contrib.driver.adcv2x.Adcv2x;
 import com.google.android.things.pio.Gpio;
 import com.google.android.things.pio.I2cDevice;
@@ -12,6 +13,8 @@ import com.google.android.things.pio.PeripheralManagerService;
 import com.google.android.things.pio.Pwm;
 import com.google.android.things.pio.SpiDevice;
 import com.google.android.things.pio.UartDevice;
+import android.graphics.Typeface;
+import android.text.Html;
 
 import java.io.IOException;
 
@@ -133,12 +136,12 @@ public abstract class SimplePicoPro extends SimpleBoard {
         }
 
         EditText editText;
-        editText = (EditText) activity.findViewById(R.id.editText);
+        editText = (EditText) activity.findViewById(R.id.editText2);
 
         if(editText != null) {
             editText.getText().append(c);
         } else {
-            Log.e(TAG,"printChar: Could not find R.id.editText");
+            Log.e(TAG,"printChar: Could not find R.id.editText2");
         }
     }
 
@@ -158,9 +161,108 @@ public abstract class SimplePicoPro extends SimpleBoard {
         }
     }
 
-    void clearStringOnScreen() {
+    int curCol = 0;
+    int curRow = 0;
+    int maxCol = 5;
+    int maxRow = 5;
+    boolean caps = false;
+    boolean symbols = false;
+
+    char[][] twoDimArr = {{'a', 'b', 'c', 'd', 'e', 'f'}, {'g', 'h', 'i', 'j', 'k', 'l'}, {'m', 'n', 'o', 'p', 'q', 'r'}, {'s', 't', 'u', 'v', 'w', 'x'}, {'y', 'z', '1', '2', '3', '4'}, {'5', '6', '7', '8', '9', '0'}};
+    char[][] twoDimArrSymbols = {{'-', '/', ':', ';', '(', ')'}, {'[', ']', '{', '}', '\"', '%'}, {'^', '*', '+', '=', '_', 'l'}, {'$', '&', '@', '.', ',', '?'}, {'!', '\'', '1', '2', '3', '4'}, {'5', '6', '7', '8', '9', '0'}};
+
+    void printKeyLayout(){
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int y = 0; y <= maxCol; y++){
+            for (int x = 0; x <= maxRow; x++){
+                if (curCol == y && curRow == x){
+                    stringBuilder.append("<b><u>");
+                    if (symbols){
+                        stringBuilder.append(twoDimArrSymbols[y][x]);
+                    }
+                    else if (!caps) {
+                        stringBuilder.append(twoDimArr[y][x]);
+                    }
+                    else{
+                        stringBuilder.append(Character.toUpperCase(twoDimArr[y][x]));
+                    }
+                    stringBuilder.append("</b></u>");
+                }
+                else{
+                    if (symbols){
+                        stringBuilder.append(twoDimArrSymbols[y][x]);
+                    }
+                    else if (!caps) {
+                        stringBuilder.append(twoDimArr[y][x]);
+                    }
+                    else{
+                        stringBuilder.append(Character.toUpperCase(twoDimArr[y][x]));
+                    }
+                }
+                stringBuilder.append(" ");
+            }
+            stringBuilder.append("<br>");
+        }
+
+        String finalString = stringBuilder.toString();
+        setTextScreen(finalString);
+    }
+    void printCurentCharacter() {
+        if (symbols){
+            printCharacterToScreen(twoDimArrSymbols[curCol][curRow]);
+        }
+        else if (!caps){
+            printCharacterToScreen(twoDimArr[curCol][curRow]);
+        }
+        else{
+            printCharacterToScreen(Character.toUpperCase(twoDimArr[curCol][curRow]));
+        }
+    }
+
+    void switchSymbol() {
+        symbols = !symbols;
+        printKeyLayout();
+    }
+
+    void downPressed(){
+        if (curCol >= maxCol){
+            curCol = 0;
+        }
+        else{
+            curCol += 1;
+        }
+    }
+
+    void upPressed(){
+        if (curCol <= 0){
+            curCol = 5;
+        }
+        else{
+            curCol -= 1;
+        }
+    }
+
+    void rightPressed(){
+        if (curRow >= maxCol){
+            curRow = 0;
+        }
+        else{
+            curRow += 1;
+        }
+    }
+
+    void leftPressed(){
+        if (curRow <= 0){
+            curRow = 5;
+        }
+        else{
+            curRow -= 1;
+        }
+    }
+
+    void setTextScreen(String s) {
         if (activity == null) {
-            Log.e(TAG,"clearString: activity is null");
+            Log.e(TAG,"printString: activity is null");
             return;
         }
 
@@ -168,10 +270,20 @@ public abstract class SimplePicoPro extends SimpleBoard {
         editText = (EditText) activity.findViewById(R.id.editText);
 
         if(editText != null) {
-            editText.setText("");
+            editText.setText(Html.fromHtml(s));
         } else {
-            Log.e(TAG,"clearString: Could not find R.id.editText");
+            Log.e(TAG,"printString: Could not find R.id.editText");
         }
+    }
+
+    void setCaps() {
+        if (caps){
+            caps = false;
+        }
+        else{
+            caps = true;
+        }
+        printKeyLayout();
     }
 
     public void teardown() {

@@ -1,7 +1,5 @@
-Android Things empty project template
+Gauthier Dieppedalle HW2 - Square Selection Text Entry Device
 =====================================
-
-Use this empty project as a template for your Android Things project.
 
 
 Pre-requisites
